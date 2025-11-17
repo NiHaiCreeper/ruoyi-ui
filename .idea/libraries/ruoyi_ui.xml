@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="ruoyi-ui">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/ruoyi-ui.zip!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
