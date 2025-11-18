@@ -15,8 +15,8 @@
     </section>
 
     <div id="content-start" class="relative -top-16"></div>
-    <nav-bar />
-    <cms-main />
+    <nav-bar @toggle-sidebar="toggleSidebar" />
+    <cms-main :sidebar-visible="isSidebarVisible" />
     <cms-footer />
     <div id="fab-container" class="fixed bottom-6 right-6 z-50 flex flex-col items-center gap-3">
       <div id="fab-actions" class="flex flex-col items-center gap-3 transition-all duration-300 opacity-0 transform scale-90 -translate-y-2 visibility-hidden">
@@ -55,7 +55,7 @@ export default {
     // ... 您的 data 不变 ...
     return {
       backgroundUrl,
-      // ...
+      isSidebarVisible: true // 默认显示
     }
   },
   computed: {
@@ -103,6 +103,9 @@ export default {
 
       // 更新最后滚动位置 (防止负值)
       this.lastScrollY = currentScrollY <= 0 ? 0 : currentScrollY;
+    },
+    toggleSidebar() {
+      this.isSidebarVisible = !this.isSidebarVisible;
     }
   },
   mounted() {

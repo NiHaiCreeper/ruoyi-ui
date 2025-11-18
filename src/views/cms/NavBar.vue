@@ -44,6 +44,16 @@
       </ul>
     </div>
 
+    <div class="sidebar-toggle-button">
+      <el-button
+        type="text"
+        icon="el-icon-notebook-2"
+        style="color: white; font-size: 1.25rem;"
+        @click="$emit('toggle-sidebar')"
+        aria-label="Toggle Sidebar"
+      />
+    </div>
+
     <div v-if="islogin" class="bg-purple">
       <el-dropdown class="avatar-container right-menu-item hover-effect" trigger="click">
         <div class="avatar-wrapper">
@@ -446,4 +456,29 @@
       cursor: pointer;
     }
   }
+
+/* START: 新增按钮的样式 */
+.sidebar-toggle-button {
+  display: none; /* 默认在移动端隐藏 */
+  margin-left: auto; /* 推到右侧 */
+  margin-right: 15px; /* 和头像保持一点距离 */
+}
+/* END: 新增按钮的样式 */
+
+/* ... @media screen and (max-width: 1000px) ... */
+
+@media screen and (max-width: 768px) {
+  /* ... */
+}
+
+/* START: 新增媒体查询 */
+/* * 在 1024px 以上时 (nihaiblog(1) 的 'lg' 断点)，
+ * 显示侧边栏切换按钮
+ */
+@media screen and (min-width: 1024px) {
+  .sidebar-toggle-button {
+    display: block;
+  }
+}
+/* END: 新增媒体查询 */
 </style>

@@ -571,3 +571,174 @@ aside {
 .multiselect--active {
   z-index: 1000 !important;
 }
+/* --- START: 新的双栏毛玻璃样式 --- */
+
+/* 1. 左侧主内容框 (#main-content) */
+#main-content {
+  /* 向上移动以覆盖封面 */
+  margin-top: -2rem;
+
+  /* 圆角 (仅顶部) 和阴影 */
+  border-top-left-radius: 1.5rem;
+  border-top-right-radius: 1.5rem;
+  box-shadow: 0 -10px 25px -5px rgba(0, 0, 0, 0.1);
+
+  /* 浅色毛玻璃 */
+  background-color: rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: none;
+
+  /* * 重要：
+   * 您的 cmsIndex.vue 内部的 <el-card>
+   * 使用了 background-color: rgba(255,255,255,0.9)。
+   * 您应该将它们改为透明，以显示底层的毛玻璃！
+   */
+  .el-card {
+    background-color: transparent !important;
+    border: none !important; /* 移除卡片边框 */
+    box-shadow: none !important; /* 移除卡片阴影 */
+  }
+}
+
+/* 深色模式：主内容框 */
+.dark #main-content {
+  background-color: rgba(39, 39, 42, 0.25);
+}
+
+/* * 2. 右侧博主信息框 (#info-sidebar)
+ * (仅在桌面端应用)
+ */
+@media screen and (min-width: 1024px) {
+  #info-sidebar {
+    /* 向上移动以对齐 */
+    margin-top: -2rem;
+
+    /* 圆角 (所有角) 和阴影 */
+    border-radius: 1.5rem;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+
+    /* 浅色毛玻璃 */
+    background-color: rgba(255, 255, 255, 0.25);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(228, 228, 231, 0.25);
+
+    /* 确保内容不溢出圆角 */
+    overflow: hidden;
+  }
+
+  /* 深色模式：侧边栏 */
+  .dark #info-sidebar {
+    background-color: rgba(39, 39, 42, 0.7); /* 稍暗的毛玻璃 */
+    border-color: rgba(63, 63, 70, 0.5);
+  }
+}
+
+/* * 3. 移动端 (1023px 及以下)
+ * 侧边栏在主内容下方，需要不同的样式
+ */
+@media screen and (max-width: 1023px) {
+  /* 主内容的内边距 (在 .el-main 的 padding 被移除后) */
+  #main-content {
+    padding: 1.5rem;
+  }
+
+  #info-sidebar {
+    /* 在移动端，它在 main 下方，需要正-margin */
+    margin-top: 1.5rem;
+    border-radius: 1.5rem;
+
+    /* 在此处应用毛玻璃效果 (移动端) */
+    background-color: rgba(255, 255, 255, 0.25);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(228, 228, 231, 0.25);
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+  }
+
+  .dark #info-sidebar {
+    background-color: rgba(39, 39, 42, 0.7);
+    border-color: rgba(63, 63, 70, 0.5);
+  }
+}
+
+/* * 4. 侧边栏内部元素的样式
+ * (从 nihaiblog(1)/style.css 复制)
+ */
+#sidebar-avatar {
+  display: block;
+  width: 6rem; height: 6rem;
+  border-radius: 9999px;
+  margin-left: auto; margin-right: auto;
+  margin-bottom: 1rem;
+  border: 2px solid rgba(255, 255, 255, 0.5);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+  object-fit: cover;
+}
+#sidebar-username {
+  text-align: center;
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+.dark #sidebar-username { color: #f9fafb; }
+#sidebar-bio {
+  text-align: center;
+  font-size: 0.875rem;
+  color: #3f3f46;
+  margin-top: 0.5rem;
+  margin-bottom: 1.25rem;
+}
+.dark #sidebar-bio { color: #d4d4d8; }
+#sidebar-stats {
+  display: flex;
+  justify-content: space-around;
+  text-align: center;
+  margin-bottom: 1.25rem;
+}
+#sidebar-stats span:first-child {
+  display: block;
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+#sidebar-stats span:last-child {
+  font-size: 0.75rem;
+  color: #71717a;
+}
+.dark #sidebar-stats span:last-child { color: #a1a1aa; }
+#sidebar-follow-btn {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  background-color: #27272a;
+  color: #ffffff;
+  transition: background-color 0.15s ease-in-out;
+}
+.dark #sidebar-follow-btn {
+  background-color: #f4f4f5;
+  color: #181b1b;
+}
+#sidebar-follow-btn:hover { background-color: #3f3f46; }
+.dark #sidebar-follow-btn:hover { background-color: #e4e4e7; }
+#sidebar-socials {
+  display: flex;
+  justify-content: center;
+  gap: 1.5rem;
+  margin-top: 1.25rem;
+  color: #71717a;
+}
+.dark #sidebar-socials { color: #a1a1aa; }
+#sidebar-socials a {
+  font-size: 1.25rem;
+  transition: color 0.15s ease-in-out;
+}
+#sidebar-socials a:hover { color: #18181b; }
+.dark #sidebar-socials a:hover { color: #f9fafb; }
+
+/* --- END: 新的双栏毛玻璃样式 --- */
