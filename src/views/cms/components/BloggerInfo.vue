@@ -1,6 +1,6 @@
 <template>
   <div class="sidebar-wrapper">
-    <el-card class="blogger-info-card" shadow="hover" style="background-color: rgba(255,255,255,0.9)">
+    <el-card class="blogger-info-card" shadow="hover">
       <div class="sidebar-toggle-internal" @click="$emit('toggle-sidebar')" title="收起侧边栏">
         <i class="el-icon-arrow-right"></i>
       </div>
@@ -30,63 +30,50 @@
 
     <div class="original-sidebar-content">
 
-      <el-card class="right-item" shadow="hover" style="background-color: rgba(255,255,255,0.9)">
-        <div slot="header" class="attributes">
-          <b>分类</b>
+      <el-card class="sidebar-card" shadow="hover">
+        <div slot="header" class="card-header">
+          <span><i class="el-icon-folder-opened"></i> 分类</span>
+          <span class="more" @click="handleGoTo('type')">更多 >></span>
         </div>
-        <ul class="blog-type-ul" style="margin-top: 5px;">
-          <li class="blog-type-li" v-for="cmsType in displayTypeList" :key="cmsType.typeId" @click="selectType(cmsType)">
-            <div style="display: flex;align-items: center">
-              <el-image style="width: 28px;height: 28px; border-radius: 50%; margin-right: 10px" lazy
-                        :src="cmsType.typePicLink" v-if="cmsType.typePicType == '0'">
-                <div slot="error" style="width: 28px;height: 28px; border-radius: 50%;">
-                  <i class="el-icon-collection" style="margin-left:6px;"></i>
-                </div>
-              </el-image>
-              <el-image style="width: 28px;height: 28px; border-radius: 50%; margin-right: 10px" lazy
-                        :src="cmsType.typePic" v-else>
-                <div slot="error" style="width: 28px;height: 28px; border-radius: 50%;">
-                  <i class="el-icon-collection" style="margin-left:6px;"></i>
-                </div>
-              </el-image>
-              {{cmsType.typeName}}
-            </div>
-            <div>{{cmsType.blogNum || 0}}</div>
+        <ul class="category-list">
+          <li v-for="item in typeList" :key="item.typeId" @click="handleFilter('typeId', item.typeId)">
+            <span class="cate-name">{{ item.typeName }}</span>
           </li>
+          <div v-if="typeList.length === 0" class="empty-text">暂无分类</div>
         </ul>
-        <div class="more" @click="dealType">
-          <i v-if="moreType" class="el-icon-arrow-down"></i>
-          <i v-else class="el-icon-arrow-up"></i>
+      </el-card>
+
+      <el-card class="sidebar-card" shadow="hover">
+        <div slot="header" class="card-header">
+          <span><i class="el-icon-collection-tag"></i> 标签</span>
+          <span class="more" @click="handleGoTo('tag')">更多 >></span>
+        </div>
+        <div class="tag-cloud">
+          <el-tag
+            v-for="item in tagList"
+            :key="item.tagId"
+            size="small"
+            class="tag-item"
+            :type="randomTagType()"
+            @click="handleFilter('tagId', item.tagId)"
+          >
+            {{ item.tagName }}
+          </el-tag>
+          <div v-if="tagList.length === 0" class="empty-text">暂无标签</div>
         </div>
       </el-card>
 
-      <el-card class="right-item" shadow="hover" style="background-color: rgba(255,255,255,0.9)">
-        <div slot="header" class="attributes">
-          <b>标签</b>
+      <el-card class="sidebar-card" shadow="hover">
+        <div slot="header" class="card-header">
+          <span><i class="el-icon-trophy"></i> 最新推荐</span>
         </div>
-        <div class="tags">
-          <div class="tag-item" v-for="tag in displayTagList" :key="tag.tagId" @click="selectTag(tag)">
-            <div class="sjx-outer">
-              <div class="sjx-inner"></div>
-            </div>
-            <div class="tag">
-              {{tag.tagName}} {{tag.blogNum || 0}}
-            </div>
-          </div>
-        </div>
-        <div class="more" @click="dealTag">
-          <i v-if="moreTag" class="el-icon-arrow-down"></i>
-          <i v-else class="el-icon-arrow-up"></i>
-        </div>
-      </el-card>
-
-      <el-card class="right-item" shadow="hover" style="background-color: rgba(255,255,255,0.9)">
-        <div slot="header" class="attributes">
-          <b>最新推荐</b>
-        </div>
-        <div class="recommend-blog l-text" v-for="blog in recommendList" :key="blog.id" @click="getBlogInfo(blog.id)">
-          <a class="recommend-a">{{blog.title}}</a>
-        </div>
+        <ul class="recommend-list">
+          <li v-for="item in recommendList" :key="item.id" @click="handleArticleClick(item.id)">
+            <div class="rec-title">{{ item.title }}</div>
+            <div class="rec-date">{{ parseTime(item.createTime, '{y}-{m}-{d}') }}</div>
+          </li>
+          <div v-if="recommendList.length === 0" class="empty-text">暂无推荐</div>
+        </ul>
       </el-card>
 
     </div>
@@ -94,7 +81,8 @@
 </template>
 
 <script>
-import { cmsListRecommend, listBlog } from "@/api/cms/blog";
+// 引入需要的 API
+import { listBlog } from "@/api/cms/blog";
 import { listType } from "@/api/cms/type";
 import { listTag } from "@/api/cms/tag";
 import { mapGetters } from "vuex";
@@ -108,18 +96,18 @@ export default {
         avatar: require("@/assets/images/profile.jpg"),
         name: "NiHaiCreeper",
         bio: "Talk is cheap. Show me the code.",
-        stats: { articles: 0, categories: 0, tags: 0 }
+        stats: {
+          articles: 0,
+          categories: 0,
+          tags: 0
+        }
       },
-      // 侧边栏数据
-      fullTypeList: [],
-      displayTypeList: [],
-      moreType: true, // 默认折叠
-
-      fullTagList: [],
-      displayTagList: [],
-      moreTag: true, // 默认折叠
-
+      // 列表数据
+      typeList: [],
+      tagList: [],
       recommendList: [],
+      // 标签颜色类型
+      tagTypes: ['', 'success', 'info', 'warning', 'danger']
     };
   },
   computed: {
@@ -127,110 +115,110 @@ export default {
   },
   created() {
     this.initData();
-    // 恢复个人信息（可选）
+    // 如果想使用当前登录用户信息覆盖默认头像和名称
     // if (this.name) this.blogger.name = this.name;
     // if (this.avatar) this.blogger.avatar = this.avatar;
   },
   methods: {
+    // 初始化所有数据
     initData() {
-      // 1. 获取统计数据
+      this.getBloggerStats();
+      this.getSideLists();
+    },
+
+    // 获取统计数据（顶部卡片用）
+    getBloggerStats() {
       listBlog().then(res => this.blogger.stats.articles = res.total);
+      listType().then(res => this.blogger.stats.categories = res.total);
+      listTag().then(res => this.blogger.stats.tags = res.total);
+    },
 
-      // 2. 获取分类列表 (使用标准接口 listType 而不是 getBlogDetail)
-      listType().then(res => {
-        this.blogger.stats.categories = res.total;
-        // 处理图片路径
-        this.fullTypeList = res.rows.map(item => {
-          if (item.typePic && item.typePic.length > 0) {
-            // 判断是否已经是绝对路径
-            if(!item.typePic.startsWith('http')) {
-              item.typePic = process.env.VUE_APP_BASE_API + item.typePic;
-            }
-          }
-          return item;
-        });
-        // 默认显示前4个
-        this.displayTypeList = this.fullTypeList.slice(0, 4);
+    // 获取下方列表数据
+    getSideLists() {
+      // 1. 获取分类列表 (取前 6 个)
+      listType({ pageNum: 1, pageSize: 6 }).then(res => {
+        this.typeList = res.rows;
       });
 
-      // 3. 获取标签列表
-      listTag().then(res => {
-        this.blogger.stats.tags = res.total;
-        this.fullTagList = res.rows;
-        // 默认显示前6个
-        this.displayTagList = this.fullTagList.slice(0, 6);
+      // 2. 获取标签列表 (取前 15 个)
+      listTag({ pageNum: 1, pageSize: 15 }).then(res => {
+        this.tagList = res.rows;
       });
 
-      // 4. 获取推荐文章
-      cmsListRecommend({ pageNum: 1, pageSize: 5 }).then(res => {
-        this.recommendList = res.rows.slice(0, 4);
+      // 3. 获取最新推荐文章
+      // 注意：这里假设您想显示“推荐”的文章。如果没有推荐字段，去掉 isRecommend 参数即为“最新文章”
+      // 常见的推荐字段可能是 'isRecommend': '1' 或 'support': '1'，请根据您的后端调整
+      let queryParams = {
+        pageNum: 1,
+        pageSize: 5,
+        orderByColumn: 'createTime',
+        isAsc: 'desc',
+        // status: '1' // 确保是已发布的
+      };
+      // 如果您的系统有推荐功能，取消下面注释
+      // queryParams.isRecommend = '1';
+
+      listBlog(queryParams).then(res => {
+        this.recommendList = res.rows;
       });
     },
 
-    // ------------------ 交互逻辑 ------------------
-
-    // 点击分类
-    selectType(cmsType) {
-      // 跳转到首页并带上分类ID
-      this.$router.push({ path: '/cms/main/cmsIndex', query: { typeId: cmsType.typeId } });
+    // 随机标签颜色
+    randomTagType() {
+      const index = Math.floor(Math.random() * this.tagTypes.length);
+      return this.tagTypes[index];
     },
 
-    // 点击标签
-    selectTag(tag) {
-      // 跳转到首页并带上标签ID
-      this.$router.push({ path: '/cms/main/cmsIndex', query: { tagId: tag.tagId } });
-    },
-
-    // 展开/收起分类
-    dealType() {
-      if (this.moreType) {
-        this.displayTypeList = this.fullTypeList; // 展开
-      } else {
-        this.displayTypeList = this.fullTypeList.slice(0, 4); // 收起
-      }
-      this.moreType = !this.moreType;
-    },
-
-    // 展开/收起标签
-    dealTag() {
-      if (this.moreTag) {
-        this.displayTagList = this.fullTagList; // 展开
-      } else {
-        this.displayTagList = this.fullTagList.slice(0, 6); // 收起
-      }
-      this.moreTag = !this.moreTag;
-    },
-
-    // 顶部三个统计图标的跳转
+    // 页面跳转 (顶部统计栏)
     handleGoTo(type) {
-      let path = "/cms/main/cmsIndex";
+      let path = "/cms/index";
+      if (type === 'blog') path = "/cms/index";
+      // 根据您的路由配置，如果有单独的分类墙/标签墙页面，请修改这里
+      // if (type === 'type') path = "/cms/type/wall";
+      // if (type === 'tag') path = "/cms/tag/wall";
       this.$router.push(path);
     },
 
-    // 点击文章跳转详情
-    getBlogInfo(blogId) {
-      let routeUrl = this.$router.resolve({
-        path: '/cms/main/blog',
-        query: { id: blogId }
+    // 点击分类/标签 -> 跳转首页并筛选
+    handleFilter(key, value) {
+      this.$router.push({
+        path: '/cms/index',
+        query: { [key]: value }
       });
-      window.open(routeUrl.href, '_blank');
+      // 触发事件让父组件重新加载列表(如果父组件在监听路由变化则不需要这步)
+      // this.$emit('filter-change');
+    },
+
+    // 点击文章 -> 跳转详情页
+    handleArticleClick(blogId) {
+      // 根据您的路由配置调整详情页路径
+      this.$router.push(`/cms/blog/${blogId}`);
+      // 或者: this.$router.push({ path: '/cms/detail', query: { id: blogId } });
     }
   }
 };
 </script>
 
 <style lang="scss" scoped>
-/* ============ 1. 博主信息卡片样式 ============ */
+.sidebar-wrapper {
+  // 整体容器样式
+}
+
+// ============ 1. 博主信息卡片样式 (复用之前) ============
 .blogger-info-card {
-  position: relative; text-align: center; border: none; margin-bottom: 20px;
+  position: relative;
+  text-align: center;
+  border: none;
+  margin-bottom: 20px; // 与下方内容拉开间距
   ::v-deep .el-card__body { padding: 20px 10px; }
+
   .blogger-avatar img {
     width: 100px; height: 100px; border-radius: 50%;
     border: 4px solid #f5f7fa; transition: transform 0.4s; cursor: pointer;
     &:hover { transform: rotate(360deg); }
   }
   .blogger-name { font-size: 22px; font-weight: 600; color: #303133; margin-top: 15px; }
-  .blogger-bio { font-size: 14px; color: #909399; margin-top: 8px; padding: 0 10px; }
+  .blogger-bio { font-size: 14px; color: #909399; margin-top: 8px; }
   .info-divider { margin: 20px 0; }
   .blogger-stats {
     display: flex; justify-content: space-around;
@@ -242,66 +230,65 @@ export default {
     }
   }
   .sidebar-toggle-internal {
-    position: absolute; top: 10px; right: 10px; padding: 5px; cursor: pointer; color: #909399;
-    &:hover { color: #409EFF; }
+    position: absolute; top: 10px; right: 10px; padding: 5px;
+    cursor: pointer; color: #909399; &:hover { color: #409EFF; }
   }
 }
 
-/* ============ 2. 复刻 cmsIndex 的 CSS 样式 ============ */
-.right-item { margin-bottom: 20px; border: none; }
-.attributes { font-weight: bold; }
+// ============ 2. 原侧边栏样式 (新增) ============
+.original-sidebar-content {
+  .sidebar-card {
+    margin-bottom: 20px;
+    border: none; // 扁平化风格
+    // border: 1px solid #e6e6e6; // 或保留边框
 
-.blog-type-ul {
-  padding-left: 10px; padding-right: 10px; margin-bottom: 0; border-radius: 5px; list-style: none;
-}
+    .card-header {
+      display: flex; justify-content: space-between; align-items: center;
+      font-size: 16px; font-weight: 600; color: #333;
+      .more { font-size: 12px; color: #999; cursor: pointer; &:hover { color: #409EFF; } }
+      i { margin-right: 5px; color: #409EFF; }
+    }
 
-.blog-type-li {
-  display: flex; justify-content: space-between; align-items: center;
-  line-height: 40px; border-bottom: 1px solid rgba(179, 216, 255, 0.5);
-  cursor: pointer;
-  &:first-child { border-top: 1px solid rgba(179, 216, 255, 0.5); }
-  &:hover { background-color: rgba(213, 255, 255, 0.3); }
-}
+    ::v-deep .el-card__body { padding: 15px; }
+  }
 
-.more { text-align: center; color: #3a8ee6; padding: 8px; cursor: pointer; }
+  // 分类列表样式
+  .category-list {
+    list-style: none; padding: 0; margin: 0;
+    li {
+      display: flex; justify-content: space-between; padding: 10px 5px;
+      border-bottom: 1px solid #f0f0f0; cursor: pointer; transition: all 0.3s;
+      &:last-child { border-bottom: none; }
+      &:hover {
+        background-color: #f9f9f9; padding-left: 10px; // 悬停向右动一点
+        .cate-name { color: #409EFF; }
+      }
+      .cate-name { font-size: 14px; color: #606266; }
+      .cate-count { font-size: 12px; color: #909399; background: #f0f2f5; padding: 2px 6px; border-radius: 10px; }
+    }
+  }
 
-.tags {
-  display: flex; flex-wrap: wrap; align-items: center;
-  margin: 15px 13px 0; border-bottom: 1px solid rgba(179, 216, 255, 0.5);
-}
+  // 标签云样式
+  .tag-cloud {
+    display: flex; flex-wrap: wrap; gap: 10px;
+    .tag-item { cursor: pointer; transition: all 0.3s; &:hover { transform: scale(1.1); } }
+  }
 
-.tag-item {
-  display: flex; justify-content: space-around; align-items: center;
-  margin-left: 5px; margin-right: 5px; margin-bottom: 10px; box-sizing: border-box;
-  cursor: pointer;
-  &:hover .tag { background-color: #409eff; color: white; }
-  &:hover .sjx-inner { border-right-color: #409eff; }
-}
+  // 推荐列表样式
+  .recommend-list {
+    list-style: none; padding: 0; margin: 0;
+    li {
+      padding: 10px 0; border-bottom: 1px dashed #eee; cursor: pointer;
+      &:last-child { border-bottom: none; }
+      &:hover .rec-title { color: #409EFF; }
+      .rec-title {
+        font-size: 14px; color: #333; margin-bottom: 5px;
+        overflow: hidden; text-overflow: ellipsis; white-space: nowrap; // 单行省略
+      }
+      .rec-date { font-size: 12px; color: #999; }
+    }
+  }
 
-.tag {
-  background-color: #ecf5ff; display: inline-block; height: 22px; padding: 0 10px;
-  line-height: 22px; font-size: 10px; color: #409eff; border-radius: 4px;
-  white-space: nowrap; border: 1px solid #409eff; border-left: none; transition: .2s;
-}
-
-.sjx-outer {
-  width: 0; height: 0; border-top: 6px solid transparent; border-bottom: 6px solid transparent;
-  border-right: 6px solid #409eff; position: relative; transition: .2s;
-}
-
-.sjx-inner {
-  border-top: 6px solid transparent; border-bottom: 6px solid transparent;
-  border-right: 6px solid #ecf5ff; top: -6px; left: 1px; position: absolute; transition: .2s;
-}
-
-.recommend-blog {
-  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-  padding-left: 10px; padding-right: 10px; margin-bottom: 0; border-radius: 5px;
-}
-
-.recommend-a {
-  border-bottom: 1px solid rgba(34, 36, 38, .15); line-height: 40px;
-  display: block; text-decoration: none; color: black; cursor: pointer;
-  &:hover { color: #3a8ee6; }
+  .empty-text { text-align: center; color: #999; font-size: 13px; padding: 10px 0; }
 }
 </style>

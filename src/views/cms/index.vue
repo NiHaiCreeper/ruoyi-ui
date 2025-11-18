@@ -55,7 +55,6 @@ export default {
     // ... 您的 data 不变 ...
     return {
       backgroundUrl,
-      isSidebarVisible: true // 默认显示
     }
   },
   computed: {
@@ -104,9 +103,7 @@ export default {
       // 更新最后滚动位置 (防止负值)
       this.lastScrollY = currentScrollY <= 0 ? 0 : currentScrollY;
     },
-    toggleSidebar() {
-      this.isSidebarVisible = !this.isSidebarVisible;
-    }
+
   },
   mounted() {
 
