@@ -1,7 +1,7 @@
 <template>
-  <el-row :gutter="20" type="flex" justify="center">
+  <el-row :gutter="20">
 
-    <el-col :xs="24" :sm="15">
+    <el-col :span="24">
       <el-card style="background-color: rgba(255,255,255,0.9)" class="left-item">
         <div slot="header" class="total">
           <div class="titleIndex">
@@ -56,69 +56,6 @@
           </div>
         </el-row>
         <pagination v-show="total>0" :total="total" :page.sync="queryParams.pageNum" :limit.sync="queryParams.pageSize" background layout="total, sizes, prev, pager, next, jumper" @pagination="getBlogList"  style="margin-bottom: 30px;float: right;margin-right: 10px;"/>
-      </el-card>
-
-    </el-col>
-
-    <el-col :xs="24" :sm="5">
-      <el-card style="background-color: rgba(255,255,255,0.9)" class=" right-item">
-        <div slot="header" class="attributes">
-          <b>分类</b>
-        </div>
-        <ul class=" blog-type-ul" style="margin-top: 5px;">
-          <li class=" blog-type-li" v-for="cmsType in typeList" :key="cmsType.typeId" @click="selectType(cmsType)"
-              :class="cmsType.typeId === typeId? 'activeType':''">
-            <div style="display: flex;align-items: center">
-              <el-image style="width: 28px;height: 28px; border-radius: 50%; margin-right: 10px" lazy
-                        :src="cmsType.typePicLink" v-show="cmsType.typePicType == '0'">
-                <div slot="error" style="width: 28px;height: 28px; border-radius: 50%;">
-                  <i class="el-icon-collection" style="margin-left:6px;"></i>
-                </div>
-              </el-image>
-              <el-image style="width: 28px;height: 28px; border-radius: 50%; margin-right: 10px" lazy
-                        :src="cmsType.typePic" v-show="cmsType.typePicType == '1'">
-                <div slot="error" style="width: 28px;height: 28px; border-radius: 50%;">
-                  <i class="el-icon-collection" style="margin-left:6px;"></i>
-                </div>
-              </el-image>
-              {{cmsType.typeName}}
-            </div>
-            <div>{{cmsType.blogNum}}</div>
-          </li>
-        </ul>
-        <div class="more" @click="dealType">
-          <i v-if="moreType" class="el-icon-arrow-down"></i>
-          <i v-else class="el-icon-arrow-up"></i>
-        </div>
-      </el-card>
-      <el-card style="background-color: rgba(255,255,255,0.9)" class=" right-item">
-        <div slot="header" class="attributes">
-          <b>标签</b>
-        </div>
-        <div class="tags">
-          <div class=" tag-item" v-for="tag in tagList" :key="tag.tagId" @click="selectTag(tag)"
-               :class="tag.tagId === tagId? 'activeTag':''">
-            <div class="sjx-outer">
-              <div class="sjx-inner"></div>
-            </div>
-            <div class="tag">
-              {{tag.tagName}}
-              {{tag.blogNum}}
-            </div>
-          </div>
-        </div>
-        <div class="more" @click="dealTag">
-          <i v-if="moreTag" class="el-icon-arrow-down"></i>
-          <i v-else class="el-icon-arrow-up"></i>
-        </div>
-      </el-card>
-      <el-card style="background-color: rgba(255,255,255,0.9)" class=" right-item">
-        <div slot="header" class="attributes">
-          <b>最新推荐</b>
-        </div>
-        <div class=" recommend-blog l-text" v-for="blog in recommendList" :key="blog.id" @click="getBlogInfo(blog.id)">
-          <a class="recommend-a">{{blog.title}}</a>
-        </div>
       </el-card>
     </el-col>
 
@@ -195,6 +132,24 @@
     },
     created() {
       window.addEventListener('resize', this.screenAdapter)
+
+    },
+    watch: {
+      // 监听路由参数变化，实现点击侧边栏后文章列表刷新
+      '$route.query': {
+        handler(newQuery) {
+          if (newQuery.typeId) {
+            // 构造模拟的 cmsType 对象以复用 selectType 方法
+            this.selectType({ typeId: newQuery.typeId, typeName: '指定分类' });
+          } else if (newQuery.tagId) {
+            this.selectTag({ tagId: newQuery.tagId, tagName: '指定标签' });
+          } else {
+            // 如果没有参数，显示全部
+            this.updateBlogList();
+          }
+        },
+        immediate: true // 组件创建时立即触发一次
+      }
     },
     mounted() {
       this.$nextTick(function () {
