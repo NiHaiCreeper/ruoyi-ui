@@ -1,6 +1,6 @@
 <template>
   <el-header :style="'margin-bottom:'+ headerBottom +'px'">
-    <h2 class="logo"><svg-icon icon-class="EarOfWheat" />  Blog</h2>
+    <h2 class="logo"><svg-icon icon-class="EarOfWheat" />NiHai  Blog</h2>
     <div class="bg-purple-light">
       <el-menu :default-active="activeIndex" router class="el-menu-demo" mode="horizontal" style="border: none;"
         background-color="rgba(0,0,0,0)" text-color="#fff" active-text-color="#ffd04b">
