@@ -265,13 +265,19 @@
 </script>
 
 <style scoped>
-  .el-header {
-    display: flex;
-    justify-content: space-between;
-    background-color: rgba(0, 0, 0, 0.2);
-    align-items: center;
-    transition: .2s;
-  }
+.el-header {
+  /* --- START: 新增这 3 行代码 --- */
+  position: sticky; /* 1. 让导航栏“粘贴”在顶部 */
+  top: 0;           /* 2. 从顶部 0px 的位置开始粘贴 */
+  z-index: 40;      /* 3. 设置堆叠顺序，确保它在毛玻璃框之上 */
+  /* --- END: 新增代码 --- */
+
+  display: flex;
+  justify-content: space-between;
+  background-color: rgba(0, 0, 0, 0.2);
+  align-items: center;
+  transition: .2s;
+}
 
   .el-header:hover {
     opacity: 1 !important;
