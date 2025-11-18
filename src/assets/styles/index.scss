@@ -68,7 +68,7 @@ body {
 }
 
 #fullpage-cover {
-  height: 100vh; /* 强制设置封面内容区域高度为 100% 视窗高度 */
+  height: 110vh !important; /* 强制设置封面内容区域高度为 100% 视窗高度 */
   transition: opacity 0.1s ease-out;
 }
 
@@ -77,20 +77,24 @@ body {
  * 将 nihaiblog(1) 的 main 样式应用到 ruoyi-ui 的 .el-main
 */
 .el-main {
-  border-top-left-radius: 1.5rem; /* rounded-t-3xl */
-  border-top-right-radius: 1.5rem; /* rounded-t-3xl */
-
-  /* 轻微地向上移动，盖住封面和背景的接缝处 */
-  margin-top: -2rem !important; /* 使用 !important 覆盖 element-ui 的内联样式 */
-
-  /* 添加阴影使其“浮”在背景上 */
-  box-shadow: 0 -10px 25px -5px rgba(0, 0, 0, 0.1), 0 -8px 10px -6px rgba(0, 0, 0, 0.1);
-
-  /* vvvv 毛玻璃效果 vvvv */
-  background-color: rgba(255, 255, 255, 0.25) !important; /* 浅色模式半透明 */
+  /* ... 您之前添加的圆角、毛玻璃、box-shadow、margin-top ... */
+  margin-top: -2rem !important;
+  border-top-left-radius: 1.5rem;
+  border-top-right-radius: 1.5rem;
+  background-color: rgba(255, 255, 255, 0.25) !important;
   backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px); /* 兼容 Safari */
-  border: none !important; /* 覆盖 el-main 可能的边框 */
+  -webkit-backdrop-filter: blur(8px);
+  box-shadow: 0 -10px 25px -5px rgba(0, 0, 0, 0.1);
+  border: none !important;
+
+  /* --- START: 新增居中和宽度限制 --- */
+  max-width: 80rem;  /* 1280px，同 nihaiblog(1) 的 max-w-7xl */
+  margin-left: auto !important;  /* 居中 */
+  margin-right: auto !important; /* 居中 */
+
+  /* 覆盖 Element UI 默认的 15px padding，确保毛玻璃框内的间距正确 */
+  padding: 2.5rem !important; /* 调整为您喜欢的内边距，例如 2.5rem (40px) */
+  /* --- END: 新增 --- */
 }
 
 .dark .el-main {
@@ -311,7 +315,7 @@ body {
 .max-w-lg { max-width: 32rem; }
 .h-12 { height: 3rem; }
 .h-14 { height: 3.5rem; }
-.h-screen { height: 100vh; }
+.h-screen { height: 100vh !important;}
 .w-1\/4 { width: 25%; }
 .w-12 { width: 3rem; }
 .w-14 { width: 3.5rem; }

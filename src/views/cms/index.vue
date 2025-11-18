@@ -81,13 +81,32 @@ export default {
         document.documentElement.classList.remove('dark');
       }
     },
-    // ... 您其他的方法 ...
+    handleScroll() {
+      // 确保 headerEl 已经被获取
+      if (!this.headerEl) return;
+
+      const currentScrollY = window.scrollY;
+
+      if (currentScrollY > this.lastScrollY && currentScrollY > this.hideTriggerPoint) {
+        // 1. 向下滚动 且 滚过了封面的一半 -> 隐藏
+        this.headerEl.classList.add('header-hidden');
+
+      } else if (currentScrollY < this.lastScrollY) {
+        // 2. 向上滚动 (无论在何处) -> 显示
+        // (这符合您 "在内容以下的时候向上滚动它就会出来" 的要求)
+        this.headerEl.classList.remove('header-hidden');
+
+      } else if (currentScrollY <= this.hideTriggerPoint) {
+        // 3. 在封面顶部区域 (0 到 封面一半) -> 始终显示
+        this.headerEl.classList.remove('header-hidden');
+      }
+
+      // 更新最后滚动位置 (防止负值)
+      this.lastScrollY = currentScrollY <= 0 ? 0 : currentScrollY;
+    }
   },
   mounted() {
-    // ... 您其他的 mounted 逻辑 ...
 
-    // 7. 组件挂载时，为 FAB 按钮绑定点击事件
-    // (注意：确保 DOM 已经渲染)
     this.$nextTick(() => {
       const themeToggle = document.getElementById('theme-toggle');
       const fabToggle = document.getElementById('fab-toggle'); // 主齿轮按钮
@@ -112,7 +131,25 @@ export default {
           }
         });
       }
+      // --- START: 新增滚动监听逻辑 ---
+
+      // 1. 获取导航栏和封面元素
+      this.headerEl = document.getElementById('main-header');
+      const coverEl = document.getElementById('fullpage-cover');
+
+      if (coverEl && this.headerEl) {
+        // 2. 计算并存储封面高度和触发点
+        this.coverHeight = coverEl.offsetHeight;
+        // 触发点为封面高度的一半
+        this.hideTriggerPoint = this.coverHeight / 2;
+      }
+
+      // 3. 绑定滚动事件
+      window.addEventListener('scroll', this.handleScroll);
+      // --- END: 新增滚动监听逻辑 ---
+
     });
+
 
     // 8. 页面加载时，根据 Vuex 状态初始化 'dark' 类
     if (this.sideTheme === 'theme-dark') {

@@ -1,5 +1,5 @@
 <template>
-  <el-header :style="'margin-bottom:'+ headerBottom +'px'">
+  <el-header id="main-header" :style="'margin-bottom:'+ headerBottom +'px'">
     <h2 class="logo"><svg-icon icon-class="EarOfWheat" />NiHai  Blog</h2>
     <div class="bg-purple-light">
       <el-menu :default-active="activeIndex" router class="el-menu-demo" mode="horizontal" style="border: none;"
@@ -266,17 +266,27 @@
 
 <style scoped>
 .el-header {
-  /* --- START: 新增这 3 行代码 --- */
-  position: sticky; /* 1. 让导航栏“粘贴”在顶部 */
-  top: 0;           /* 2. 从顶部 0px 的位置开始粘贴 */
-  z-index: 40;      /* 3. 设置堆叠顺序，确保它在毛玻璃框之上 */
-  /* --- END: 新增代码 --- */
+  /* --- START: 修改/新增 --- */
+  position: fixed;   /* 1. 将 sticky 改为 fixed */
+  top: 0;
+  width: 100%;       /* 2. 添加 100% 宽度 (fixed 布局必需) */
+  z-index: 40;       /* 3. 确保 z-index 存在 (之前已添加) */
+  transform: translateY(0); /* 4. 添加 transform 默认状态 (显示) */
+  /* 5. 修改 transition 属性，使其包含 transform */
+  transition: transform 0.3s ease-in-out, opacity .2s;
+  /* --- END: 修改/新增 --- */
 
   display: flex;
   justify-content: space-between;
   background-color: rgba(0, 0, 0, 0.2);
   align-items: center;
-  transition: .2s;
+  /* transition: .2s;  <-- 这行被上面的新 transition 替换 */
+}
+
+/* --- START: 新增 .header-hidden 规则 --- */
+/* 这个类将由 JS 添加，用于控制隐藏动画 */
+.el-header.header-hidden {
+  transform: translateY(-100%); /* 向上滑出 100% 的高度 */
 }
 
   .el-header:hover {

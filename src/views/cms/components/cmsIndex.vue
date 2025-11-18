@@ -1,6 +1,6 @@
 <template>
-  <el-row :gutter="20">
-    <el-col :sm="2" class="hidden-xs-only" style="opacity:0;">左侧占位</el-col>
+  <el-row :gutter="20" type="flex" justify="center">
+
     <el-col :xs="24" :sm="15">
       <el-card style="background-color: rgba(255,255,255,0.9)" class="left-item">
         <div slot="header" class="total">
@@ -8,10 +8,9 @@
             <i v-if="selected" class="el-icon-back" @click="updateBlogList"></i>
             <span>{{selectMethod}}</span>
           </div>
-          <!-- <span>共 <span style="color: #3a8ee6; font-size: 20px">{{totalcount}}</span> 篇</span> -->
         </div>
         <el-row type="flex" align="middle" style="flex-wrap: wrap" :gutter="20" v-for="blog in blogList" :key="blog.id"
-          shadow="never" class="blog-content">
+                shadow="never" class="blog-content">
           <div @click="getBlogInfo(blog.id)">
             <el-col class="img" :xs="24" :sm="6">
               <el-image v-if="blog.blogPicType == '0'" lazy :src="blog.blogPicLink">
@@ -25,7 +24,7 @@
               <div>
                 <h3><svg-icon icon-class="Topping" v-show="blog.top==1" /> {{blog.title}}</h3>
                 <div style="margin-bottom: 10px;">
-                    <span style="color: rgba(0, 0, 0, .4);"> {{blog.blogDesc}}</span>
+                  <span style="color: rgba(0, 0, 0, .4);"> {{blog.blogDesc}}</span>
                 </div>
                 <div style="margin-bottom: 10px;">
                   <el-tag effect="plain" size="mini" v-for="tag in blog.tags" :key="tag.tagId" type="success">
@@ -60,6 +59,7 @@
       </el-card>
 
     </el-col>
+
     <el-col :xs="24" :sm="5">
       <el-card style="background-color: rgba(255,255,255,0.9)" class=" right-item">
         <div slot="header" class="attributes">
@@ -67,16 +67,16 @@
         </div>
         <ul class=" blog-type-ul" style="margin-top: 5px;">
           <li class=" blog-type-li" v-for="cmsType in typeList" :key="cmsType.typeId" @click="selectType(cmsType)"
-            :class="cmsType.typeId === typeId? 'activeType':''">
+              :class="cmsType.typeId === typeId? 'activeType':''">
             <div style="display: flex;align-items: center">
               <el-image style="width: 28px;height: 28px; border-radius: 50%; margin-right: 10px" lazy
-                :src="cmsType.typePicLink" v-show="cmsType.typePicType == '0'">
+                        :src="cmsType.typePicLink" v-show="cmsType.typePicType == '0'">
                 <div slot="error" style="width: 28px;height: 28px; border-radius: 50%;">
                   <i class="el-icon-collection" style="margin-left:6px;"></i>
                 </div>
               </el-image>
               <el-image style="width: 28px;height: 28px; border-radius: 50%; margin-right: 10px" lazy
-                :src="cmsType.typePic" v-show="cmsType.typePicType == '1'">
+                        :src="cmsType.typePic" v-show="cmsType.typePicType == '1'">
                 <div slot="error" style="width: 28px;height: 28px; border-radius: 50%;">
                   <i class="el-icon-collection" style="margin-left:6px;"></i>
                 </div>
@@ -97,7 +97,7 @@
         </div>
         <div class="tags">
           <div class=" tag-item" v-for="tag in tagList" :key="tag.tagId" @click="selectTag(tag)"
-            :class="tag.tagId === tagId? 'activeTag':''">
+               :class="tag.tagId === tagId? 'activeTag':''">
             <div class="sjx-outer">
               <div class="sjx-inner"></div>
             </div>
@@ -121,7 +121,7 @@
         </div>
       </el-card>
     </el-col>
-    <el-col :sm="2" class="hidden-xs-only" style="opacity:0;">右侧占位</el-col>
+
   </el-row>
 </template>
 
