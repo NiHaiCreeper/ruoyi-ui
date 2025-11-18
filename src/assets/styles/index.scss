@@ -5,6 +5,384 @@
 @import './sidebar.scss';
 @import './btn.scss';
 
+/* --- 来自 nihaiblog(1)/style.css --- */
+button {
+  background-color: transparent;
+  background-image: none;
+  border-width: 0;
+  padding: 0;
+  line-height: inherit;
+  color: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+html {
+  scroll-behavior: smooth; /* scroll-smooth */
+}
+
+/* 强制 body 透明，以显示 #page-background */
+body {
+  background-color: transparent !important;
+}
+
+/* --- 来自 nihaiblog(1)/style.css --- */
+/* ================================== */
+/* --- 背景主题渐变切换 --- */
+/* ================================== */
+
+#page-background::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  /* 暗黑模式的图片 (请确保路径在 ruoyi-ui 中可访问) */
+  background-size: cover;
+  background-position: center;
+  filter: brightness(0.5);
+  opacity: 0;
+  transition: opacity 0.7s ease-in-out;
+  z-index: -1;
+}
+
+.dark #page-background::before {
+  opacity: 1;
+}
+#page-background{
+  /* 亮色模式的图片 (请确保路径在 ruoyi-ui 中可访问) */
+  background-size: cover;
+  background-position: center;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  z-index: -2;
+  filter: brightness(0.9);
+  opacity: 1;
+  transition: opacity 5.5s ease-in-out;
+}
+
+#fullpage-cover {
+  height: 100vh; /* 强制设置封面内容区域高度为 100% 视窗高度 */
+  transition: opacity 0.1s ease-out;
+}
+
+
+/* * vvvv 【【【重要适配：修改此选择器】】】 vvvv
+ * 将 nihaiblog(1) 的 main 样式应用到 ruoyi-ui 的 .el-main
+*/
+.el-main {
+  border-top-left-radius: 1.5rem; /* rounded-t-3xl */
+  border-top-right-radius: 1.5rem; /* rounded-t-3xl */
+
+  /* 轻微地向上移动，盖住封面和背景的接缝处 */
+  margin-top: -2rem !important; /* 使用 !important 覆盖 element-ui 的内联样式 */
+
+  /* 添加阴影使其“浮”在背景上 */
+  box-shadow: 0 -10px 25px -5px rgba(0, 0, 0, 0.1), 0 -8px 10px -6px rgba(0, 0, 0, 0.1);
+
+  /* vvvv 毛玻璃效果 vvvv */
+  background-color: rgba(255, 255, 255, 0.25) !important; /* 浅色模式半透明 */
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px); /* 兼容 Safari */
+  border: none !important; /* 覆盖 el-main 可能的边框 */
+}
+
+.dark .el-main {
+  /* 深色模式毛玻璃 */
+  background-color: rgba(39, 39, 42, 0.25) !important;
+}
+
+/* --- 来自 nihaiblog(1)/style.css --- */
+/* --- 向下箭头动画 --- */
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(-25%);
+    animation-timing-function: cubic-bezier(0.8, 0, 1, 1);
+  }
+  50% {
+    transform: translateY(0);
+    animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
+  }
+}
+.animate-bounce {
+  animation: bounce 1.5s infinite;
+}
+
+/* --- Hero 入场动画 --- */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 将动画应用到 Hero 区域的元素 */
+#hero-title, #hero-subtitle, #site-bio {
+  animation-name: fadeInUp;
+  animation-duration: 0.8s; /* 动画时长 */
+  animation-timing-function: ease-out; /* 缓动效果 */
+  animation-fill-mode: backwards; /* 确保动画开始前元素是隐藏的 */
+}
+
+#hero-subtitle {
+  animation-delay: 0.2s;
+}
+#site-bio {
+  animation-delay: 0.4s;
+  color: #FFF; /* 确保文字是白色 */
+}
+
+/* --- 来自 nihaiblog(1)/style.css --- */
+/* ================================== */
+/* --- 悬浮操作按钮 (FAB) --- */
+/* ================================== */
+#fab-container {
+  bottom: 1.5rem;  /* 对应 .bottom-6 */
+  right: 1.5rem;   /* 对应 .right-6 */
+  opacity: 0;
+  transform: translateY(100px);
+  transition: opacity 0.4s ease, transform 0.4s ease;
+  visibility: hidden;
+  position: fixed; /* 确保 FAB 是固定的 */
+  z-index: 50; /* 确保在顶层 */
+}
+#fab-container.fab-visible {
+  opacity: 1;
+  transform: translateY(0);
+  visibility: visible;
+}
+
+/* 展开时的样式 */
+#fab-container.is-active #fab-actions {
+  opacity: 1;
+  transform: scale(1) translateY(0);
+  visibility: visible;
+}
+
+/* 齿轮旋转 */
+#fab-container.is-active #fab-toggle i {
+  transform: rotate(90deg);
+}
+
+/* 隐藏的按钮 */
+#fab-actions {
+  visibility: hidden;
+}
+
+/* (可选) 为小按钮添加悬停效果 */
+#fab-actions .fab-button {
+  transition: all 0.2s ease;
+}
+#fab-actions .fab-button:hover {
+  transform: scale(1.1);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+/* --- 来自 nihaiblog(1)/style.css --- */
+/* --- 暗黑模式基础 --- */
+.dark body {
+  background-color: #18181b; /* dark:bg-zinc-900 */
+  color: #f9fafb; /* dark:text-zinc-100 */
+}
+
+/* --- 暗黑模式：毛玻璃和透明度 --- */
+.dark #posts .card {
+  background-color: rgba(39, 39, 42, 0.5) !important;
+}
+
+/* 导航栏图标 (logo, theme, links) */
+.dark #main-header .dark\:bg-zinc-100 {
+  background-color: rgba(249, 250, 251, 0.5);
+}
+.dark #main-header .dark\:hover\:bg-zinc-800:hover {
+  background-color: rgba(39, 39, 42, 0.5);
+}
+
+/* 搜索框 */
+.dark #search.dark\:bg-zinc-900 {
+  background-color: rgba(24, 24, 27, 0.5);
+  border-color: rgba(63, 63, 70, 0.5);
+}
+
+/* 标签按钮 (未选中) */
+.dark #tag-list button.dark\:border-zinc-700 {
+  border-color: rgba(63, 63, 70, 0.5);
+}
+.dark #tag-list button.dark\:hover\:bg-zinc-800:hover {
+  background-color: rgba(39, 39, 42, 0.5);
+}
+/* 标签按钮 (选中) - 保持不透明以保证可读性 */
+.dark #tag-list button.dark\:bg-zinc-100 {
+  background-color: #f9fafb; /* color: #18181b; /* dark:text-zinc-900 */
+}
+
+/* 分页按钮 */
+.dark #pager button.dark\:border-zinc-700 {
+  background-color: rgba(39, 39, 42, 0.3);
+  border-color: rgba(63, 63, 70, 0.5);
+}
+.dark #pager button.dark\:border-zinc-700:hover {
+  background-color: rgba(39, 39, 42, 0.7);
+}
+
+/* "关于我" 卡片 */
+.dark #about .card {
+  background-color: rgba(39, 39, 42, 0.5); /* 深色模式半透明 */
+  border-color: rgba(63, 63, 70, 0.5); /* 深色模式半透明边框 */
+}
+
+/* article.html 页面卡片 */
+.dark #single-post-container .card.dark\:bg-zinc-800 {
+  background-color: rgba(39, 39, 42, 0.7); /* 内容页不透明度稍高 */
+  border-color: rgba(63, 63, 70, 0.5);
+}
+
+/* 页脚 */
+.dark footer.dark\:bg-zinc-900 {
+  background-color: rgba(24, 24, 27, 0.5);
+  border-color: rgba(63, 63, 70, 0.5);
+}
+
+/* --- 暗黑模式：侧边栏 (Sidebar) --- */
+.dark #info-sidebar.dark\:bg-zinc-800 {
+  background-color: rgba(39, 39, 42, 0.7); /* 70% 透明度 */
+  border-color: rgba(63, 63, 70, 0.5);
+}
+.dark #sidebar-username {
+  color: #f9fafb; /* dark:text-zinc-100 */
+}
+.dark #sidebar-bio {
+  color: #d4d4d8; /* dark:text-zinc-300 */
+}
+.dark #sidebar-stats span:last-child {
+  color: #a1a1aa; /* dark:text-zinc-400 */
+}
+.dark #sidebar-follow-btn {
+  background-color: #f4f4f5; /* dark:bg-zinc-100 */
+  color: #18181b; /* dark:text-zinc-900 */
+}
+.dark #sidebar-follow-btn:hover {
+  background-color: #e4e4e7; /* dark:hover:bg-zinc-200 */
+}
+.dark #sidebar-socials {
+  color: #a1a1aa; /* dark:text-zinc-400 */
+}
+.dark #sidebar-socials a:hover {
+  color: #f9fafb; /* dark:hover:text-zinc-100 */
+}
+
+/* --- 暗黑模式：Prose (文本) --- */
+.dark .prose-invert {
+  color: #d4d4d8; /* text-zinc-300 */
+}
+.dark .prose-invert strong {
+  color: #f9fafb; /* text-zinc-100 */
+}
+
+/* --- 暗黑模式：FAB 按钮 --- */
+.dark .dark\:bg-zinc-700 {
+  background-color: #3f3f46;
+}
+.dark .dark\:text-zinc-100 {
+  color: #f9fafb;
+}
+
+/* --- 来自 nihaiblog(1)/style.css --- */
+/* --- Tailwind CSS 转换 (部分) --- */
+.fixed { position: fixed; }
+.absolute { position: absolute; }
+.relative { position: relative; }
+.bottom-4 { bottom: 1rem; }
+.bottom-6 { bottom: 1.5rem; }
+.right-6 { right: 1.5rem; }
+.z-50 { z-index: 50; }
+.flex { display: flex; }
+.hidden { display: none; }
+.max-w-lg { max-width: 32rem; }
+.h-12 { height: 3rem; }
+.h-14 { height: 3.5rem; }
+.h-screen { height: 100vh; }
+.w-1\/4 { width: 25%; }
+.w-12 { width: 3rem; }
+.w-14 { width: 3.5rem; }
+.flex-col { flex-direction: column; }
+.items-center { align-items: center; }
+.justify-center { justify-content: center; }
+.gap-3 { gap: 0.75rem; }
+.p-6 { padding: 1.5rem; }
+.my-5 { margin-top: 1.25rem; margin-bottom: 1.25rem; }
+.mt-3 { margin-top: 0.75rem; }
+.text-lg { font-size: 1.125rem; line-height: 1.75rem; }
+.text-xl { font-size: 1.25rem; line-height: 1.75rem; }
+.text-2xl { font-size: 1.5rem; line-height: 2rem; }
+.text-4xl { font-size: 2.25rem; line-height: 2.5rem; }
+.text-base { font-size: 1rem; line-height: 1.5rem; }
+.font-bold { font-weight: 700; }
+.text-center { text-align: center; }
+.text-white { color: #fff; }
+.text-zinc-900 { color: #18181b; }
+.border-white\/30 { border-color: rgba(255, 255, 255, 0.3); }
+.rounded-full { border-radius: 9999px; }
+.bg-white { background-color: #ffffff; }
+.bg-blue-600 { background-color: #2563eb; }
+.shadow-lg { box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1); }
+.shadow-xl { box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1); }
+.opacity-0 { opacity: 0; }
+.opacity-70 { opacity: 0.7; }
+.transform { transform: scale(1); }
+.transition-all { transition-property: all; transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1); transition-duration: 150ms; }
+.transition-transform { transition-property: transform; }
+.duration-200 { transition-duration: 200ms; }
+.duration-300 { transition-duration: 300ms; }
+.scale-90 { transform: scale(.9); }
+.-translate-y-2 { transform: translateY(-0.5rem); }
+.visibility-hidden { visibility: hidden; }
+.hover\:text-white:hover { color: #fff; }
+.hover\:scale-110:hover { transform: scale(1.1); }
+.active\:scale-100:active { transform: scale(1); }
+
+/* 响应式类 (Responsive) */
+@media (min-width: 768px) { /* md: */
+  .md\:text-5xl { font-size: 3rem; line-height: 1; }
+  .md\:text-xl { font-size: 1.25rem; line-height: 1.75rem; }
+}
+
+/* --- .prose 简化版回退 --- */
+.prose p {
+  margin-top: 1.25em;
+  margin-bottom: 1.25em;
+}
+.prose ul, .prose ol {
+  margin-top: 1.25em;
+  margin-bottom: 1.25em;
+  padding-left: 1.75em;
+}
+.prose ul {
+  list-style-type: disc;
+}
+.prose ol {
+  list-style-type: decimal;
+}
+.prose strong {
+  font-weight: 600;
+}
+.prose-zinc {
+  color: #3f3f46; /* text-zinc-700 */
+}
+.prose-zinc strong {
+  color: #18181b; /* text-zinc-900 */
+}
+
 body {
   height: 100%;
   -moz-osx-font-smoothing: grayscale;
