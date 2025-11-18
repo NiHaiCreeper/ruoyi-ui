@@ -1,7 +1,7 @@
 <template>
-  <el-row :gutter="20">
+  <el-row :gutter="20" type="flex" justify="center">
 
-    <el-col :span="24">
+    <el-col :xs="26" :sm="26">
       <el-card style="background-color: rgba(255,255,255,0.9)" class="left-item">
         <div slot="header" class="total">
           <div class="titleIndex">
@@ -58,7 +58,6 @@
         <pagination v-show="total>0" :total="total" :page.sync="queryParams.pageNum" :limit.sync="queryParams.pageSize" background layout="total, sizes, prev, pager, next, jumper" @pagination="getBlogList"  style="margin-bottom: 30px;float: right;margin-right: 10px;"/>
       </el-card>
     </el-col>
-
   </el-row>
 </template>
 
@@ -132,24 +131,6 @@
     },
     created() {
       window.addEventListener('resize', this.screenAdapter)
-
-    },
-    watch: {
-      // 监听路由参数变化，实现点击侧边栏后文章列表刷新
-      '$route.query': {
-        handler(newQuery) {
-          if (newQuery.typeId) {
-            // 构造模拟的 cmsType 对象以复用 selectType 方法
-            this.selectType({ typeId: newQuery.typeId, typeName: '指定分类' });
-          } else if (newQuery.tagId) {
-            this.selectTag({ tagId: newQuery.tagId, tagName: '指定标签' });
-          } else {
-            // 如果没有参数，显示全部
-            this.updateBlogList();
-          }
-        },
-        immediate: true // 组件创建时立即触发一次
-      }
     },
     mounted() {
       this.$nextTick(function () {

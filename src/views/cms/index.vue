@@ -15,9 +15,9 @@
     </section>
 
     <div id="content-start" class="relative -top-16"></div>
-    <nav-bar @toggle-sidebar="toggleSidebar" />
-    <cms-main :sidebar-visible="isSidebarVisible" />
-    <cms-footer />
+    <nav-bar />
+    <cms-main />
+    <cms-footer/>
     <div id="fab-container" class="fixed bottom-6 right-6 z-50 flex flex-col items-center gap-3">
       <div id="fab-actions" class="flex flex-col items-center gap-3 transition-all duration-300 opacity-0 transform scale-90 -translate-y-2 visibility-hidden">
         <button id="theme-toggle" class="fab-button bg-white dark:bg-zinc-700 text-zinc-900 dark:text-zinc-100 w-12 h-12 rounded-full shadow-lg flex items-center justify-center" aria-label="toggle theme">🌙</button>
