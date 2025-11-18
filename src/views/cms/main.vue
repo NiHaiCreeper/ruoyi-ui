@@ -13,11 +13,11 @@
                class="w-24 h-24 rounded-full mx-auto mb-4 border-2 border-white/50 shadow-md object-cover">
 
           <h3 id="sidebar-username" class="text-xl font-semibold text-center">
-            ...
+            NiHaiCreeper
           </h3>
 
           <p id="sidebar-bio" class="text-sm text-zinc-700 dark:text-zinc-300 text-center mt-2 mb-5">
-            ...
+            画画、游戏与日常碎片
           </p>
 
           <div id="sidebar-stats" class="flex justify-around text-center mb-5">
@@ -83,11 +83,7 @@ export default {
 }
 </script>
 
-<style scoped>
-/* * 移除旧的 .el-main { min-height: 650px; } 样式
- * 替换为新的布局样式
- */
-
+<style>
 /* * 1. 桌面端布局 (lg: 1024px 及以上)
  * 模仿 nihaiblog(1) 的 .lg:flex .lg:max-w-7xl .lg:mx-auto .lg:gap-6
  */
@@ -146,6 +142,10 @@ export default {
     flex-direction: column; /* 垂直堆叠 */
     width: 100%;
     gap: 0;
+    /* 确保在移动端也有内边距 */
+    padding-left: 1rem;
+    padding-right: 1rem;
+    box-sizing: border-box; /* 确保 padding 不会撑开宽度 */
   }
 
   #main-content {
