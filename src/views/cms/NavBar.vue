@@ -1,5 +1,5 @@
 <template>
-  <el-header id="main-header" :style="'margin-bottom:'+ headerBottom +'px'">
+  <el-header id="main-header" :style="'margin-bottom:'+ headerBottom +'px'" :class="{'header-hidden': headerHidden}">
     <h2 class="logo"><svg-icon icon-class="EarOfWheat" />NiHai  Blog</h2>
     <div class="bg-purple-light">
       <el-menu :default-active="activeIndex" router class="el-menu-demo" mode="horizontal" style="border: none;"
@@ -103,6 +103,11 @@
         searchInput: true,
         menuHiddenVisiable: false,
         headerBottom: 0,
+        headerHidden: false,
+        lastScrollY: 0,
+        hideThreshold: 60,
+        showThreshold: 30,
+        boundScrollHandler: null,
         queryInfo: {
           query: '',
           timer: null
@@ -157,13 +162,45 @@
             this.searchBlog()
           }, 300)
         }
+      },
+      menuHiddenVisiable(val) {
+        if (val) {
+          this.headerHidden = false;
+        }
       }
     },
     created() {
       this.login();
       // this.ResponsiveLayout();
     },
+    mounted() {
+      this.lastScrollY = window.scrollY || 0;
+      this.boundScrollHandler = () => { this.onScroll(); };
+      window.addEventListener('scroll', this.boundScrollHandler, { passive: true });
+    },
+    beforeDestroy() {
+      if (this.boundScrollHandler) {
+        window.removeEventListener('scroll', this.boundScrollHandler);
+        this.boundScrollHandler = null;
+      }
+    },
     methods: {
+      onScroll() {
+        const currentY = window.scrollY || 0;
+        const delta = currentY - this.lastScrollY;
+        const scrollingDown = delta > 0;
+        if (this.menuHiddenVisiable) {
+          this.headerHidden = false;
+          this.lastScrollY = currentY;
+          return;
+        }
+        if (scrollingDown && currentY > this.hideThreshold) {
+          this.headerHidden = true;
+        } else if (!scrollingDown && (this.lastScrollY - currentY) > this.showThreshold) {
+          this.headerHidden = false;
+        }
+        this.lastScrollY = currentY;
+      },
       menulistAdd() {
         //push()方法一般是添加到数组的最后的位置；unshift()方法是往最前面的位置添加。
         // this.menulist.push({id:"",authName:""})
@@ -186,6 +223,7 @@
       menuExpend() {
         this.menuHiddenVisiable = !this.menuHiddenVisiable
         if (this.menuHiddenVisiable === true) {
+          this.headerHidden = false;
           this.headerBottom = (this.menulist.length + 1) * 56
         } else {
           this.headerBottom = 0

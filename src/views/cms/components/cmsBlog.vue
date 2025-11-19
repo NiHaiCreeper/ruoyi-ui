@@ -2,7 +2,8 @@
   <el-row :gutter="20">
     <el-col :sm="3" class="hidden-xs-only" style="opacity:0;">左侧占位</el-col>
     <el-col :xs="24" :sm="18">
-      <el-card style="background-color: rgba(255, 255, 255,1)" class="first-card">
+      <div class="post-cover" :style="coverStyle"></div>
+      <el-card class="first-card glass-card">
         <div slot="header" class="total blog-info">
           <div class="user-info">
             <i class="el-icon-user"></i>
@@ -77,7 +78,7 @@
             <li>发表时间 {{blog.createTime}}</li>
           </ul>
         </div>
-        <el-card shadow="never" class="comments">
+        <el-card shadow="never" class="comments glass-card">
           <div class="header" style="padding-bottom: 10px;">
             评论
           </div>
@@ -87,23 +88,7 @@
       </el-col>
       <el-col :xs="24" :sm="0"></el-col>
     <el-col :sm="3" class="hidden-xs-only" style="opacity:0;">右侧占位</el-col>
-    <!-- 设置底部距离的 -->
-    <el-backtop :bottom="60">
-          <div
-          style="{
-            height: 50px;
-            width: 50px;
-            background-color: rgba(240,239,241,1);
-            box-shadow: 0 0 6px rgba(0,0,0, .12);
-            text-align: center;
-            line-height: 40px;
-            border-radius:2px;
-            color: #1989fa;
-          }"
-        >
-          <svg-icon icon-class="top" />
-        </div>
-    </el-backtop>
+
   </el-row>
 </template>
 
@@ -145,7 +130,22 @@ export default {
     ...mapState([
       'userInfo',
       'administrator',
-    ])
+    ]),
+    coverStyle() {
+      const b = this.blog || {};
+      let src = '';
+      if (b.blogPicType === '0' && b.blogPicLink) {
+        src = b.blogPicLink;
+      } else if (b.blogPicType === '1' && b.blogPic) {
+        if ((b.blogPic + '').length > 0) {
+          src = process.env.VUE_APP_BASE_API + b.blogPic;
+        }
+      }
+      if (!src) {
+        src = '/errorImg.jpg';
+      }
+      return { backgroundImage: `url(${src})` };
+    }
   },
   methods: {
     // 获取博客详情信息
@@ -181,6 +181,17 @@ export default {
 
   .el-card {
     width: 100%;
+  }
+
+  .post-cover {
+    height: 50vh;
+    border-radius: 10px;
+    background-size: cover;
+    background-position: center center;
+    background-repeat: no-repeat;
+    box-shadow: 0 10px 20px rgba(0,0,0,.08);
+    margin-bottom: -60px;
+    transition: margin-bottom 0.2s ease, height 0.2s ease;
   }
 
   .el-popper /deep/ {
@@ -271,6 +282,8 @@ export default {
   }
   .blog-title {
     text-align: center;
+    margin-top: -6px;
+    padding-top: 6px;
   }
 
   .blog-info {
@@ -320,6 +333,11 @@ export default {
   @media only screen and (max-width: 480px) {
     h2 {
       font-weight: normal;
+    }
+
+    .post-cover {
+      height: 36vh;
+      margin-bottom: -30px;
     }
 
     code, pre {

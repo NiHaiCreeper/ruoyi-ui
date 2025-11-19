@@ -9,9 +9,11 @@
         </transition>
       </el-col>
 
-      <el-col :span="sidebarSpan" class="right-sidebar-col" v-if="isSidebarVisible">
-        <BloggerInfo @toggle-sidebar="toggleSidebar" />
-      </el-col>
+      <transition name="slide-sidebar" appear>
+        <el-col :span="sidebarSpan" class="right-sidebar-col" v-if="isSidebarVisible">
+          <BloggerInfo @toggle-sidebar="toggleSidebar" />
+        </el-col>
+      </transition>
     </el-row>
 
     <div class="sidebar-toggle-hidden" v-if="!isSidebarVisible" @click="toggleSidebar" title="展开侧边栏">
@@ -68,5 +70,19 @@ export default {
   display: flex; align-items: center; justify-content: center;
   cursor: pointer; z-index: 100; box-shadow: -2px 0 5px rgba(0,0,0,0.1);
   &:hover { background-color: #eef2f8; }
+}
+
+/* 侧栏滑入/滑出动画 */
+.slide-sidebar-enter-active, .slide-sidebar-leave-active, .slide-sidebar-appear-active {
+  transition: transform 0.32s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.32s ease;
+  will-change: transform, opacity;
+}
+.slide-sidebar-enter, .slide-sidebar-appear, .slide-sidebar-leave-to {
+  transform: translateX(120%);
+  opacity: 0;
+}
+.slide-sidebar-enter-to, .slide-sidebar-appear-to, .slide-sidebar-leave {
+  transform: translateX(0);
+  opacity: 1;
 }
 </style>

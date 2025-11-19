@@ -5,6 +5,35 @@
 @import './sidebar.scss';
 @import './btn.scss';
 
+/* --- 全局玻璃态主题变量 --- */
+:root {
+  --glass-card-bg: rgba(255, 255, 255, 0.85);
+  --glass-card-border-color: rgba(0, 0, 0, 0.08);
+  --glass-text-color: #1f2937;
+  --glass-blur: 10px;
+  --glass-radius: 10px;
+  --glass-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
+}
+.dark :root {
+  --glass-card-bg: rgba(39, 39, 42, 0.65);
+  --glass-card-border-color: rgba(255, 255, 255, 0.12);
+  --glass-text-color: #f3f4f6;
+  --glass-blur: 10px;
+  --glass-radius: 10px;
+  --glass-shadow: 0 10px 20px rgba(0, 0, 0, 0.14);
+}
+
+/* 通用玻璃态卡片/容器 */
+.glass-card {
+  background-color: var(--glass-card-bg) !important;
+  color: var(--glass-text-color);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid var(--glass-card-border-color);
+  border-radius: var(--glass-radius);
+  box-shadow: var(--glass-shadow);
+}
+
 /* --- 来自 nihaiblog(1)/style.css --- */
 button {
   background-color: transparent;

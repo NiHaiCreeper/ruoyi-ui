@@ -1,7 +1,7 @@
 <template>
   <el-row :gutter="20" type="flex" justify="center">
 
-    <el-col :xs="26" :sm="26">
+    <el-col :xs="26" :sm="18">
       <el-card style="background-color: rgba(255,255,255,0.9)" class="left-item">
         <div slot="header" class="total">
           <div class="titleIndex">

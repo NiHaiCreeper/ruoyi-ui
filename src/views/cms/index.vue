@@ -16,9 +16,9 @@
 
     <div id="content-start" class="relative -top-16"></div>
     <nav-bar />
-    <cms-main />
+    <router-view />
     <cms-footer/>
-    <div id="fab-container" class="fixed bottom-6 right-6 z-50 flex flex-col items-center gap-3">
+    <div id="fab-container" class="fixed bottom-6 right-6 z-50 flex flex-col items-center gap-3 fab-hidden">
       <div id="fab-actions" class="flex flex-col items-center gap-3 transition-all duration-300 opacity-0 transform scale-90 -translate-y-2 visibility-hidden">
         <button id="theme-toggle" class="fab-button bg-white dark:bg-zinc-700 text-zinc-900 dark:text-zinc-100 w-12 h-12 rounded-full shadow-lg flex items-center justify-center" aria-label="toggle theme">🌙</button>
         <a id="rss-link" href="#" class="fab-button bg-white dark:bg-zinc-700 text-zinc-900 dark:text-zinc-100 w-12 h-12 rounded-full shadow-lg flex items-center justify-center" aria-label="rss">📡</a>
@@ -37,7 +37,7 @@
 // 1. 导入 vuex 辅助函数
 import { mapState, mapActions } from 'vuex'
 import NavBar from './NavBar'
-import cmsMain from './main'
+
 import cmsFooter from './Footer'
 import {
   cmsListBlog
@@ -48,13 +48,17 @@ export default {
   name: 'Cms',
   components: {
     NavBar,
-    cmsMain,
     cmsFooter
   },
   data() {
-    // ... 您的 data 不变 ...
     return {
       backgroundUrl,
+      isFabVisible: false,
+      showThreshold: 300,
+      hideThreshold: 220,
+      boundFabToggleClick: null,
+      boundFabScrollHandler: null,
+      boundThemeToggleClick: null
     }
   },
   computed: {
@@ -67,43 +71,35 @@ export default {
 
     // 4. 创建新的切换方法
     toggleCmsTheme() {
-      // 确定新主题
       const newTheme = this.sideTheme === 'theme-dark' ? 'theme-light' : 'theme-dark';
-
-      // 5. 提交 Vuex 状态变更
       this.changeSetting({ key: 'sideTheme', value: newTheme });
-
-      // 6. 切换 CSS 所需的 'dark' 类
       if (newTheme === 'theme-dark') {
         document.documentElement.classList.add('dark');
       } else {
         document.documentElement.classList.remove('dark');
       }
+      this.updateThemeToggleUI(newTheme);
     },
-    handleScroll() {
-      // 确保 headerEl 已经被获取
-      if (!this.headerEl) return;
+    updateThemeToggleUI(theme = this.sideTheme) {
+      const btn = document.getElementById('theme-toggle');
+      if (!btn) return;
+      const isDark = theme === 'theme-dark';
+      btn.textContent = isDark ? '☀️' : '🌙';
+      btn.setAttribute('aria-label', isDark ? '切换为浅色主题' : '切换为暗色主题');
+      btn.setAttribute('title', isDark ? '切换为浅色主题' : '切换为暗色主题');
+    },
 
-      const currentScrollY = window.scrollY;
 
-      if (currentScrollY > this.lastScrollY && currentScrollY > this.hideTriggerPoint) {
-        // 1. 向下滚动 且 滚过了封面的一半 -> 隐藏
-        this.headerEl.classList.add('header-hidden');
-
-      } else if (currentScrollY < this.lastScrollY) {
-        // 2. 向上滚动 (无论在何处) -> 显示
-        // (这符合您 "在内容以下的时候向上滚动它就会出来" 的要求)
-        this.headerEl.classList.remove('header-hidden');
-
-      } else if (currentScrollY <= this.hideTriggerPoint) {
-        // 3. 在封面顶部区域 (0 到 封面一半) -> 始终显示
-        this.headerEl.classList.remove('header-hidden');
+  },
+  watch: {
+    sideTheme(newTheme) {
+      if (newTheme === 'theme-dark') {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
       }
-
-      // 更新最后滚动位置 (防止负值)
-      this.lastScrollY = currentScrollY <= 0 ? 0 : currentScrollY;
-    },
-
+      this.updateThemeToggleUI(newTheme);
+    }
   },
   mounted() {
 
@@ -113,40 +109,52 @@ export default {
       const fabContainer = document.getElementById('fab-container'); // 容器
 
       if (themeToggle) {
-        themeToggle.addEventListener('click', this.toggleCmsTheme);
+        this.boundThemeToggleClick = this.toggleCmsTheme;
+        themeToggle.addEventListener('click', this.boundThemeToggleClick);
+        this.updateThemeToggleUI(this.sideTheme);
       }
 
       // nihaiblog(1) 中用于展开/折叠 FAB 的逻辑
       if (fabToggle && fabContainer) {
-        fabToggle.addEventListener('click', () => {
+        this.boundFabToggleClick = () => {
           fabContainer.classList.toggle('is-active');
-        });
+        };
+        fabToggle.addEventListener('click', this.boundFabToggleClick);
 
-        // (可选) 滚动时显示 FAB
-        window.addEventListener('scroll', () => {
-          if (window.scrollY > 300) {
+        // 初始化为收起状态
+        fabContainer.classList.add('fab-hidden');
+        this.isFabVisible = false;
+
+        // 滚动时显示/收起 FAB（带缩回动画，含阈值回差）
+        this.boundFabScrollHandler = () => {
+          const y = window.scrollY;
+          if (!this.isFabVisible && y >= this.showThreshold) {
             fabContainer.classList.add('fab-visible');
-          } else {
+            fabContainer.classList.remove('fab-hidden');
+            this.isFabVisible = true;
+          } else if (this.isFabVisible && y <= this.hideThreshold) {
+            fabContainer.classList.add('fab-hidden');
             fabContainer.classList.remove('fab-visible');
+            this.isFabVisible = false;
           }
-        });
+        };
+        window.addEventListener('scroll', this.boundFabScrollHandler, { passive: true });
+
+        // 初始可见性校准（根据当前滚动位置）
+        {
+          const y0 = window.scrollY;
+          if (y0 >= this.showThreshold) {
+            fabContainer.classList.add('fab-visible');
+            fabContainer.classList.remove('fab-hidden');
+            this.isFabVisible = true;
+          } else {
+            fabContainer.classList.add('fab-hidden');
+            fabContainer.classList.remove('fab-visible');
+            this.isFabVisible = false;
+          }
+        }
       }
-      // --- START: 新增滚动监听逻辑 ---
-
-      // 1. 获取导航栏和封面元素
-      this.headerEl = document.getElementById('main-header');
-      const coverEl = document.getElementById('fullpage-cover');
-
-      if (coverEl && this.headerEl) {
-        // 2. 计算并存储封面高度和触发点
-        this.coverHeight = coverEl.offsetHeight;
-        // 触发点为封面高度的一半
-        this.hideTriggerPoint = this.coverHeight / 2;
-      }
-
-      // 3. 绑定滚动事件
-      window.addEventListener('scroll', this.handleScroll);
-      // --- END: 新增滚动监听逻辑 ---
+      // 导航栏滚动隐藏逻辑由 NavBar.vue 负责
 
     });
 
@@ -157,6 +165,24 @@ export default {
     } else {
       document.documentElement.classList.remove('dark');
     }
+    this.updateThemeToggleUI(this.sideTheme);
+  },
+  beforeDestroy() {
+    const themeToggle = document.getElementById('theme-toggle');
+    const fabToggle = document.getElementById('fab-toggle');
+    if (themeToggle && this.boundThemeToggleClick) {
+      themeToggle.removeEventListener('click', this.boundThemeToggleClick);
+      this.boundThemeToggleClick = null;
+    }
+    if (fabToggle && this.boundFabToggleClick) {
+      fabToggle.removeEventListener('click', this.boundFabToggleClick);
+      this.boundFabToggleClick = null;
+    }
+    if (this.boundFabScrollHandler) {
+      window.removeEventListener('scroll', this.boundFabScrollHandler);
+      this.boundFabScrollHandler = null;
+    }
+    // 导航栏滚动事件由 NavBar.vue 管理，无需在此移除
   }
 }
 </script>
@@ -185,4 +211,9 @@ export default {
       background-position-y: 0;
     }
   }
+#fab-container { transition: transform 280ms cubic-bezier(0.22, 1, 0.36, 1), opacity 220ms ease-out; will-change: transform, opacity; }
+#fab-container.fab-visible { opacity: 1; transform: translateY(0) scale(1); }
+#fab-container.fab-hidden { opacity: 0; transform: translateY(24px) scale(0.85); pointer-events: none; }
+#fab-actions { transition: transform 220ms ease-out, opacity 220ms ease-out; opacity: 0; transform: translateY(8px) scale(0.95); will-change: transform, opacity; }
+#fab-container.is-active #fab-actions { opacity: 1; transform: translateY(-8px) scale(1); }
 </style>
